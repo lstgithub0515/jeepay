@@ -57,7 +57,7 @@ public class BizExceptionResolver implements HandlerExceptionResolver {
 
 		//业务异常
         if(ex instanceof BizException) {
-        	logger.error("公共捕捉[Biz]异常：{}",ex.getMessage());
+        	logger.error("公共捕捉[Biz]异常：",ex);
 			outPutJson = ((BizException) ex).getApiRes().toJSONString();
         }else if(ex instanceof DataAccessException){
 			logger.error("公共捕捉[DataAccessException]异常：",ex);

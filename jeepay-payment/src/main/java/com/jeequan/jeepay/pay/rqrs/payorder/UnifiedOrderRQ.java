@@ -80,6 +80,14 @@ public class UnifiedOrderRQ extends AbstractMchAppRQ {
     /** 特定渠道发起额外参数 **/
     private String channelExtra;
 
+    public String getChannelExtra() {
+        return channelExtra;
+    }
+
+    public void setChannelExtra(String channelExtra) {
+        this.channelExtra = channelExtra;
+    }
+
     /** 商户扩展参数 **/
     private String extParam;
 

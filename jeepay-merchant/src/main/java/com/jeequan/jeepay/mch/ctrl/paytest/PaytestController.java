@@ -120,6 +120,7 @@ public class PaytestController extends CommonCtrl {
         // 前端明确了支付参数的类型 payDataType
         String payDataType = getValString("payDataType");
         String authCode = getValString("authCode");
+        String priceId = getValString("priceId");
 
 
         MchApp mchApp = mchAppService.getById(appId);
@@ -155,6 +156,7 @@ public class PaytestController extends CommonCtrl {
         JSONObject extParams = new JSONObject();
         if(StringUtils.isNotEmpty(payDataType)) {
             extParams.put("payDataType", payDataType.trim());
+            extParams.put("priceId", priceId.trim());
         }
         if(StringUtils.isNotEmpty(authCode)) {
             extParams.put("authCode", authCode.trim());

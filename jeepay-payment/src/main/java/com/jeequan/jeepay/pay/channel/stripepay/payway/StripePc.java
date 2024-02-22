@@ -80,34 +80,34 @@ public class StripePc extends StripepayPaymentService {
             Exception {
         StripePcOrderRQ bizRQ = (StripePcOrderRQ) rq;
 
-    // Stripe.apiKey = "sk_test_51ObwshJ9BMMXaWbIPK4e2FUC2lGaQhndVjh0TRwBFrhOrySkF8njuiTCgOCXqstuvIFu1cQSZUScWHhCVkR7Y1PK00k6KpPzP9";
-    // Map<String, String> resultMap = new HashMap<>();
-    //
-    String successUrl = "http://localhost:4242/success.html";
-    //String successUrl = "https://buy.stripe.com/test_9AQdUD5Kl9DGaEE000";
-    String failUrl = "http://localhost:4242/cancel.html";
-    //String failUrl = "https://buy.stripe.com/test_9AQdUD5Kl9DGaEE000";
-    //
-    SessionCreateParams params =
-            SessionCreateParams.builder()
-                    .setMode(SessionCreateParams.Mode.SUBSCRIPTION)  // 订阅模式
-                    .setSuccessUrl(successUrl)
-                    .setCancelUrl(failUrl)
-                    .addLineItem(
-                            SessionCreateParams.LineItem.builder()
-                                    .setQuantity(1L)
-                                    .setPrice("wqeq")
-                                    .build())
-                    .build();
-    Session session = Session.create(params);
+//        Stripe.apiKey = "sk_test_51ObwshJ9BMMXaWbIPK4e2FUC2lGaQhndVjh0TRwBFrhOrySkF8njuiTCgOCXqstuvIFu1cQSZUScWHhCVkR7Y1PK00k6KpPzP9";
+        // Map<String, String> resultMap = new HashMap<>();
+        //
+        String successUrl = "http://localhost:4242/success.html";
+        //String successUrl = "https://buy.stripe.com/test_9AQdUD5Kl9DGaEE000";
+        String failUrl = "http://localhost:4242/cancel.html";
+        //String failUrl = "https://buy.stripe.com/test_9AQdUD5Kl9DGaEE000";
+        //
+        SessionCreateParams params =
+                SessionCreateParams.builder()
+                        .setMode(SessionCreateParams.Mode.SUBSCRIPTION)  // 订阅模式
+                        .setSuccessUrl(successUrl)
+                        .setCancelUrl(failUrl)
+                        .addLineItem(
+                                SessionCreateParams.LineItem.builder()
+                                        .setQuantity(1L)
+                                        .setPrice(bizRQ.getPriceId())
+                                        .build())
+                        .build();
+        Session session = Session.create(params);
 
-    String sessionId = session.getId();
-    //log.info("sessionId :{}",session.getId());
+        String sessionId = session.getId();
+        //log.info("sessionId :{}",session.getId());
 
-    String url = session.getUrl();  // 结账界面
-    //
-    // //resultMap.put("sessionId",sessionId);
-    //     return url;
+        String url = session.getUrl();  // 结账界面
+        //
+        // //resultMap.put("sessionId",sessionId);
+        //     return url;
 
         // 构造函数响应数据
         StripePcOrderRS res = ApiResBuilder.buildSuccess(StripePcOrderRS.class);

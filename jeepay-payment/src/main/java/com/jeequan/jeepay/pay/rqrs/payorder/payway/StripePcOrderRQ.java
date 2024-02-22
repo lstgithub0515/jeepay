@@ -22,8 +22,8 @@ public class StripePcOrderRQ extends CommonPayDataRQ {
     @NotBlank(message = "取消支付返回站点")
     private String cancelUrl;
 
-    // @NotBlank(message = "priceId信息不能为空")
-    // private String priceId;
+     @NotBlank(message = "priceId信息不能为空")
+     private String priceId;
     //
     // @NotBlank(message = "商品数量信息不能为空")
     // private Long number;
