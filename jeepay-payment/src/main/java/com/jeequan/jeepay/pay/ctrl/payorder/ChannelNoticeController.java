@@ -29,6 +29,8 @@ import com.jeequan.jeepay.pay.service.ConfigContextService;
 import com.jeequan.jeepay.pay.service.PayMchNotifyService;
 import com.jeequan.jeepay.pay.service.PayOrderProcessService;
 import com.jeequan.jeepay.service.impl.PayOrderService;
+import com.stripe.model.*;
+import com.stripe.net.Webhook;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -38,9 +40,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import spark.Request;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /*
 * 渠道侧的通知入口Controller 【分为同步跳转（doReturn）和异步回调(doNotify) 】
@@ -164,7 +169,116 @@ public class ChannelNoticeController extends AbstractCtrl {
     /** 异步回调入口 **/
     @ResponseBody
     @RequestMapping(value= {"/api/pay/notify/{ifCode}", "/api/pay/notify/{ifCode}/{payOrderId}"})
-    public ResponseEntity doNotify(HttpServletRequest request, @PathVariable("ifCode") String ifCode, @PathVariable(value = "payOrderId", required = false) String urlOrderId){
+    public ResponseEntity doNotify(HttpServletRequest request, @PathVariable("ifCode") String ifCode, @PathVariable(value = "payOrderId", required = false) String urlOrderId) throws IOException {
+        String endpointSecret = "whsec_fcd8bfb6cfce736eb4f4833a8dd80afc18aa412025c7f134edcea32cfc0ae927";
+        Event event = null;
+        InputStream inputStream = request.getInputStream();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024*4];
+        int n = 0;
+        while (-1 != (n = inputStream.read(buffer))) {
+            output.write(buffer, 0, n);
+        }
+        byte[] bytes = output.toByteArray();
+        String payload = new String(bytes, "UTF-8");
+        String sigHeader = request.getHeader("Stripe-Signature");
+        try {
+            event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+        } catch (Exception e) {
+            // Invalid payload
+            //response.status(400);
+           return null;
+        } /*catch (SignatureVerificationException e) {
+            // Invalid signature
+            response.status(400);
+            return "";
+        }*/
+
+        // 检查事件状态
+//        if (StripeEventType.PAYMENT_INTENT_SUCCEEDED.getEventType().equals(event.getType())) {
+//            Optional<StripeObject> object = event.getDataObjectDeserializer().getObject();
+//            if (!object.isPresent()){
+//                response.status(400);
+//                return event;
+//            }
+//
+//            Session sessionEvent= (Session) object.get();
+//            SessionRetrieveParams params =
+//                    SessionRetrieveParams.builder()
+//                            .addExpand("line_items")
+//                            .build();
+//
+//            Session session = Session.retrieve(sessionEvent.getId(), params, null);
+//
+//            SessionListLineItemsParams listLineItemsParams =
+//                    SessionListLineItemsParams.builder()
+//                            .build();
+//
+//            // Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
+//            LineItemCollection lineItems = session.listLineItems(listLineItemsParams);
+//            // Fulfill the purchase...
+//            fulfillOrder(lineItems);
+//
+//            System.out.println("事件内容：" + event.getData());
+//        }
+
+        EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
+        StripeObject stripeObject = null;
+        if (dataObjectDeserializer.getObject().isPresent()) {
+            stripeObject = dataObjectDeserializer.getObject().get();
+        } else {
+            return null;
+        }
+
+        switch (event.getType()) {
+            case "payment_intent.canceled": {
+                PaymentIntent paymentIntent = (PaymentIntent) stripeObject;
+                System.out.println("取消付款");
+                break;
+            }
+            case "payment_intent.created": {
+                PaymentIntent paymentIntent = (PaymentIntent) stripeObject;
+                System.out.println("创建付款");
+                break;
+            }
+            case "payment_intent.payment_failed": {
+                PaymentIntent paymentIntent = (PaymentIntent) stripeObject;
+                System.out.println("付款失败");
+                break;
+            }
+            case "charge.refunded": {
+                Charge charge = (Charge) stripeObject;
+                System.out.println("退款成功");
+                break;
+            }
+            case "payment_intent.succeeded": {
+
+//                Session sessionEvent= (Session) object.get();
+//                SessionRetrieveParams params =
+//                        SessionRetrieveParams.builder()
+//                                .addExpand("line_items")
+//                                .build();
+//
+//                Session session = Session.retrieve(sessionEvent.getId(), params, null);
+//
+//                SessionListLineItemsParams listLineItemsParams =
+//                        SessionListLineItemsParams.builder()
+//                                .build();
+//
+//                // Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
+//                LineItemCollection lineItems = session.listLineItems(listLineItemsParams);
+//                // Fulfill the purchase...
+//                fulfillOrder(lineItems);
+                PaymentIntent paymentIntent = (PaymentIntent) stripeObject;
+                System.out.println("付款成功:" + paymentIntent);
+                System.out.println("事件内容：" + event.getData());
+                break;
+            }
+            // ... handle other event types
+            default:
+                System.out.println("Unhandled event type: " + event.getType());
+        }
+
 
         String payOrderId = null;
         String logPrefix = "进入[" +ifCode+ "]支付回调：urlOrderId：["+ StringUtils.defaultIfEmpty(urlOrderId, "") + "] ";

@@ -35,7 +35,10 @@
             <groupId>com.jeequan</groupId>
             <artifactId>jeepay-components-mq</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
         <!-- 依赖 sping-boot-web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
