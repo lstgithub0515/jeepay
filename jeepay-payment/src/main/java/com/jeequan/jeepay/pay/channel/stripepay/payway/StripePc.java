@@ -80,7 +80,7 @@ public class StripePc extends StripepayPaymentService {
             Exception {
         StripePcOrderRQ bizRQ = (StripePcOrderRQ) rq;
 
-        Stripe.apiKey = "sk_test_51ObwshJ9BMMXaWbIPK4e2FUC2lGaQhndVjh0TRwBFrhOrySkF8njuiTCgOCXqstuvIFu1cQSZUScWHhCVkR7Y1PK00k6KpPzP9";
+//        Stripe.apiKey = "sk_test_51ObwshJ9BMMXaWbIPK4e2FUC2lGaQhndVjh0TRwBFrhOrySkF8njuiTCgOCXqstuvIFu1cQSZUScWHhCVkR7Y1PK00k6KpPzP9";
         // Map<String, String> resultMap = new HashMap<>();
         //
         String successUrl = "http://localhost:4242/success.html";

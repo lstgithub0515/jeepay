@@ -25,8 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -46,15 +44,11 @@ import java.util.Arrays;
  * @Date 2019/11/7 15:19
  * @Description  spring-boot 主启动程序
  **/
-
+@SpringBootApplication
 @EnableScheduling
-@MapperScan({"com.jeequan.jeepay.service.mapper", "com.jeequan.jeepay.service.mappermetaxsire"})    //Mybatis mapper接口路径
+@MapperScan("com.jeequan.jeepay.service.mapper")    //Mybatis mapper接口路径
 @ComponentScan(basePackages = "com.jeequan.jeepay.*")   //由于MainApplication没有在项目根目录， 需要配置basePackages属性使得成功扫描所有Spring组件；
 @Configuration
-@SpringBootApplication(exclude={
-        DataSourceAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class,
-})
 public class JeepayPayApplication {
 
     @Autowired private SystemYmlConfig systemYmlConfig;
